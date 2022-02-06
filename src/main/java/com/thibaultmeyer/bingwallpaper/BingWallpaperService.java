@@ -2,6 +2,7 @@ package com.thibaultmeyer.bingwallpaper;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thibaultmeyer.bingwallpaper.wallpaperchanger.LinuxGnomeWallpaperChanger;
 import com.thibaultmeyer.bingwallpaper.wallpaperchanger.MacOsWallpaperChanger;
 import com.thibaultmeyer.bingwallpaper.wallpaperchanger.WallpaperChanger;
 import com.thibaultmeyer.bingwallpaper.wallpaperchanger.WindowsWallpaperChanger;
@@ -25,6 +26,7 @@ public final class BingWallpaperService implements Runnable {
     private static final String USER_AGENT_EDGE = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36 Edg/97.0.1072.69";
 
     private static final List<WallpaperChanger> WALLPAPER_CHANGER_LIST = Arrays.asList(
+        new LinuxGnomeWallpaperChanger(),
         new MacOsWallpaperChanger(),
         new WindowsWallpaperChanger());
 
