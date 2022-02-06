@@ -15,7 +15,7 @@ import java.util.HashMap;
 public class WindowsWallpaperChanger implements WallpaperChanger {
 
     @Override
-    public boolean checkRequirement() {
+    public boolean canRunOnThisSystem() {
         return OperatingSystem.IS_WINDOWS;
     }
 

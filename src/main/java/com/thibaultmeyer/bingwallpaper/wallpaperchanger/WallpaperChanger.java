@@ -6,11 +6,11 @@ package com.thibaultmeyer.bingwallpaper.wallpaperchanger;
 public interface WallpaperChanger {
 
     /**
-     * Determine if this wallpaper changer can work.
+     * Determine if this wallpaper changer works on this current operating system.
      *
      * @return {@code true} if it can work, otherwise, {@code false}
      */
-    boolean checkRequirement();
+    boolean canRunOnThisSystem();
 
     /**
      * Change the Wallpaper.

@@ -3,6 +3,8 @@ package com.thibaultmeyer.bingwallpaper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thibaultmeyer.bingwallpaper.wallpaperchanger.MacOsWallpaperChanger;
+import com.thibaultmeyer.bingwallpaper.wallpaperchanger.WallpaperChanger;
+import com.thibaultmeyer.bingwallpaper.wallpaperchanger.WindowsWallpaperChanger;
 
 import java.awt.*;
 import java.io.File;
@@ -13,12 +15,18 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
+import java.util.List;
 
 public final class BingWallpaperService implements Runnable {
 
     private static final String BING_URL = "https://www.bing.com";
     private static final String BING_API_URL = BING_URL + "/HPImageArchive.aspx?format=js&idx=0&n=1&nc=%d&uhd=1&uhdwidth=%d&uhdheight=%d";
     private static final String USER_AGENT_EDGE = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36 Edg/97.0.1072.69";
+
+    private static final List<WallpaperChanger> WALLPAPER_CHANGER_LIST = Arrays.asList(
+        new MacOsWallpaperChanger(),
+        new WindowsWallpaperChanger());
 
     private final Dimension wallpaperDimension;
     private final String tmpFileName;
@@ -34,18 +42,41 @@ public final class BingWallpaperService implements Runnable {
         this.tmpFileName = tmpFileName;
     }
 
+    /**
+     * Determine if  Wallpaper Changer can work on this current operating system.
+     *
+     * @return {@code true} if it can work, otherwise, {@code false}
+     */
+    public static boolean canRunOnThisSystem() {
+        return WALLPAPER_CHANGER_LIST
+            .stream()
+            .anyMatch(WallpaperChanger::canRunOnThisSystem);
+    }
+
     @Override
     public void run() {
         try {
             final URL url = retrieveDailyWallpaperUrl(wallpaperDimension.width, wallpaperDimension.height);
             if (url != null) {
                 if (saveToLocal(url, tmpFileName)) {
-                    new MacOsWallpaperChanger().changeWallpaper(tmpFileName);
+                    final boolean result = WALLPAPER_CHANGER_LIST
+                        .stream()
+                        .filter(WallpaperChanger::canRunOnThisSystem)
+                        .findFirst()
+                        .map(wallpaperChanger -> wallpaperChanger.changeWallpaper(tmpFileName))
+                        .orElse(false);
+                    if (result) {
+                        System.out.println("New wallpaper applied with success");
+                    } else {
+                        System.err.println("Can't apply new wallpaper");
+                    }
                 }
             }
         } catch (final IOException ex) {
             throw new RuntimeException(ex);
         }
+
+        System.gc();
     }
 
     /**

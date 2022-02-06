@@ -23,6 +23,13 @@ public final class BingWallpaper {
      * @throws IOException If something goes wrong during the process
      */
     public static void main(final String[] args) throws IOException {
+        System.out.println("Booting...");
+
+        if (!BingWallpaperService.canRunOnThisSystem()) {
+            System.err.println("Can't run on this operating system");
+            System.exit(1);
+        }
+
         // TODO: Parse args to get target, width and height
         final String temporaryFolder = System.getProperty("java.io.tmpdir");
         final String targetFileName = temporaryFolder.endsWith("/")
@@ -33,6 +40,10 @@ public final class BingWallpaper {
         final Dimension screenDimension = retrieveScreenDimension();
 
         // Run service (looking for new wallpaper each hour)
+        System.out.printf("  > Dimension     : %d x %d%n", screenDimension.width, screenDimension.height);
+        System.out.printf("  > Temporary file: %s%n", targetFileName);
+
+        System.out.println("Ready!");
         scheduledExecutorService.scheduleWithFixedDelay(
             new BingWallpaperService(screenDimension, targetFileName),
             0,

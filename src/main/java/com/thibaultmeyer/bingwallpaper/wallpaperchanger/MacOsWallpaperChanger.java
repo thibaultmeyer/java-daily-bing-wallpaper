@@ -10,7 +10,7 @@ import java.io.IOException;
 public class MacOsWallpaperChanger implements WallpaperChanger {
 
     @Override
-    public boolean checkRequirement() {
+    public boolean canRunOnThisSystem() {
         return OperatingSystem.IS_MAC;
     }
 
