@@ -1,6 +1,6 @@
 package com.thibaultmeyer.bingwallpaper.wallpaperchanger;
 
-import com.thibaultmeyer.bingwallpaper.utils.OperatingSystem;
+import com.thibaultmeyer.bingwallpaper.utils.OperatingSystemUtils;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -12,8 +12,11 @@ public class LinuxGnomeWallpaperChanger implements WallpaperChanger {
 
     @Override
     public boolean canRunOnThisSystem() {
-        if (OperatingSystem.IS_UNIX || OperatingSystem.IS_SOLARIS) {
+        if (OperatingSystemUtils.IS_UNIX || OperatingSystemUtils.IS_SOLARIS) {
             String desktop = System.getenv("XDG_CURRENT_DESKTOP");
+            if (desktop == null || desktop.isEmpty()) {
+                desktop = System.getenv("DESKTOP_SESSION");
+            }
             desktop = desktop == null
                 ? ""
                 : desktop.toUpperCase(Locale.ENGLISH);

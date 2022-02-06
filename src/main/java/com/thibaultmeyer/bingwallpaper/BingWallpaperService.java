@@ -19,6 +19,9 @@ import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * This service takes care of getting the wallpaper of the day and using it.
+ */
 public final class BingWallpaperService implements Runnable {
 
     private static final String BING_URL = "https://www.bing.com";
@@ -58,14 +61,14 @@ public final class BingWallpaperService implements Runnable {
     @Override
     public void run() {
         try {
-            final URL url = retrieveDailyWallpaperUrl(wallpaperDimension.width, wallpaperDimension.height);
+            final URL url = retrieveDailyWallpaperUrl();
             if (url != null) {
-                if (saveToLocal(url, tmpFileName)) {
+                if (saveToLocal(url)) {
                     final boolean result = WALLPAPER_CHANGER_LIST
                         .stream()
                         .filter(WallpaperChanger::canRunOnThisSystem)
                         .findFirst()
-                        .map(wallpaperChanger -> wallpaperChanger.changeWallpaper(tmpFileName))
+                        .map(wp -> wp.changeWallpaper(tmpFileName))
                         .orElse(false);
                     if (result) {
                         System.out.println("New wallpaper applied with success");
@@ -84,15 +87,16 @@ public final class BingWallpaperService implements Runnable {
     /**
      * Retrieve daily wallpaper URL from Bing API.
      *
-     * @param width  The requested image "width" dimension
-     * @param height The requested image "height" dimension
      * @return The wallpaper image URL
      * @throws IOException If something goes wrong during the process
      */
-    private URL retrieveDailyWallpaperUrl(final int width, final int height) throws IOException {
-        final long currentTimeStamp = System.currentTimeMillis() / 1000;
+    private URL retrieveDailyWallpaperUrl() throws IOException {
+        final URL bingApiUrl = new URL(String.format(
+            BING_API_URL,
+            System.currentTimeMillis() / 1000,
+            wallpaperDimension.width,
+            wallpaperDimension.height));
 
-        final URL bingApiUrl = new URL(String.format(BING_API_URL, currentTimeStamp, width, height));
         final HttpURLConnection httpConnection = (HttpURLConnection) bingApiUrl.openConnection();
         httpConnection.setRequestProperty("User-Agent", USER_AGENT_EDGE);
 
@@ -118,19 +122,21 @@ public final class BingWallpaperService implements Runnable {
     /**
      * Save content from a URL into a local file.
      *
-     * @param urlToSave      URL of the content to retrieve
-     * @param targetFileName Target full file name (ie: /tmp/file.jpg)
+     * @param urlToSave URL of the content to retrieve
      * @return {@code true} in case of success, otherwise, {@code false}
      * @throws IOException If something goes wrong during the process
      */
-    private boolean saveToLocal(final URL urlToSave, final String targetFileName) throws IOException {
+    private boolean saveToLocal(final URL urlToSave) throws IOException {
         final HttpURLConnection httpConnection = (HttpURLConnection) urlToSave.openConnection();
         httpConnection.setRequestProperty("User-Agent", USER_AGENT_EDGE);
 
         if (httpConnection.getResponseCode() == 200) {
             final InputStream inputStream = httpConnection.getInputStream();
 
-            Files.copy(inputStream, new File(targetFileName).toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(
+                inputStream,
+                new File(tmpFileName).toPath(),
+                StandardCopyOption.REPLACE_EXISTING);
 
             inputStream.close();
             httpConnection.disconnect();

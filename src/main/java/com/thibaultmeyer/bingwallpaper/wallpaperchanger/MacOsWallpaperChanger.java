@@ -1,6 +1,6 @@
 package com.thibaultmeyer.bingwallpaper.wallpaperchanger;
 
-import com.thibaultmeyer.bingwallpaper.utils.OperatingSystem;
+import com.thibaultmeyer.bingwallpaper.utils.OperatingSystemUtils;
 
 import java.io.IOException;
 
@@ -11,7 +11,7 @@ public class MacOsWallpaperChanger implements WallpaperChanger {
 
     @Override
     public boolean canRunOnThisSystem() {
-        return OperatingSystem.IS_MAC;
+        return OperatingSystemUtils.IS_MAC;
     }
 
     @Override

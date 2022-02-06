@@ -1,6 +1,9 @@
 package com.thibaultmeyer.bingwallpaper.utils;
 
-public final class OperatingSystem {
+/**
+ * Utility to determine the operating system.
+ */
+public final class OperatingSystemUtils {
 
     private static final String OS = System.getProperty("os.name").toLowerCase();
 

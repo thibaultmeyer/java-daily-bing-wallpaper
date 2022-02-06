@@ -1,6 +1,6 @@
 package com.thibaultmeyer.bingwallpaper;
 
-import com.thibaultmeyer.bingwallpaper.utils.OperatingSystem;
+import com.thibaultmeyer.bingwallpaper.utils.OperatingSystemUtils;
 
 import java.awt.*;
 import java.io.IOException;
@@ -30,7 +30,9 @@ public final class BingWallpaper {
             System.exit(1);
         }
 
-        // TODO: Parse args to get target, width and height
+        // TODO: Load properties files from "~/.bing-wallpaper-changer/settings.properties
+        // TODO: By default: use this directory to store downloaded picture
+
         final String temporaryFolder = System.getProperty("java.io.tmpdir");
         final String targetFileName = temporaryFolder.endsWith("/")
             ? temporaryFolder + "file.jpg"
@@ -58,7 +60,7 @@ public final class BingWallpaper {
      * @throws IOException If something goes wrong during the process
      */
     public static Dimension retrieveScreenDimension() throws IOException {
-        if (OperatingSystem.IS_MAC) {
+        if (OperatingSystemUtils.IS_MAC) {
             final Runtime runtime = Runtime.getRuntime();
             final Process process = runtime.exec("system_profiler SPDisplaysDataType");
 

@@ -5,7 +5,7 @@ import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.win32.StdCallLibrary;
 import com.sun.jna.win32.W32APIFunctionMapper;
 import com.sun.jna.win32.W32APITypeMapper;
-import com.thibaultmeyer.bingwallpaper.utils.OperatingSystem;
+import com.thibaultmeyer.bingwallpaper.utils.OperatingSystemUtils;
 
 import java.util.HashMap;
 
@@ -16,7 +16,7 @@ public class WindowsWallpaperChanger implements WallpaperChanger {
 
     @Override
     public boolean canRunOnThisSystem() {
-        return OperatingSystem.IS_WINDOWS;
+        return OperatingSystemUtils.IS_WINDOWS;
     }
 
     @Override
