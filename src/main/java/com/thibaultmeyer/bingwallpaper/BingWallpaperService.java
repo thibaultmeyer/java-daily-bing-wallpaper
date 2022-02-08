@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.Proxy;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -97,8 +98,7 @@ public final class BingWallpaperService implements Runnable {
             wallpaperDimension.width,
             wallpaperDimension.height));
 
-        final HttpURLConnection httpConnection = (HttpURLConnection) bingApiUrl.openConnection();
-        httpConnection.setRequestProperty("User-Agent", USER_AGENT_EDGE);
+        final HttpURLConnection httpConnection = createHttpConnection(bingApiUrl);
 
         if (httpConnection.getResponseCode() == 200) {
             final InputStreamReader inputStreamReader = new InputStreamReader(httpConnection.getInputStream());
@@ -127,8 +127,7 @@ public final class BingWallpaperService implements Runnable {
      * @throws IOException If something goes wrong during the process
      */
     private boolean saveToLocal(final URL urlToSave) throws IOException {
-        final HttpURLConnection httpConnection = (HttpURLConnection) urlToSave.openConnection();
-        httpConnection.setRequestProperty("User-Agent", USER_AGENT_EDGE);
+        final HttpURLConnection httpConnection = createHttpConnection(urlToSave);
 
         if (httpConnection.getResponseCode() == 200) {
             final InputStream inputStream = httpConnection.getInputStream();
@@ -146,5 +145,34 @@ public final class BingWallpaperService implements Runnable {
         }
 
         return false;
+    }
+
+    /**
+     * Create an HTTP connection.
+     *
+     * @param url URL to use
+     * @return Created HTTP connection
+     * @throws IOException If something goes wrong during the process
+     */
+    private HttpURLConnection createHttpConnection(final URL url) throws IOException {
+        final Proxy proxy = configureProxy();
+        final HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection(proxy);
+        httpConnection.setRequestProperty("User-Agent", USER_AGENT_EDGE);
+        httpConnection.setConnectTimeout(15000);
+        httpConnection.setReadTimeout(15000);
+
+        return httpConnection;
+    }
+
+    /**
+     * Configure Proxy.
+     *
+     * @return Configured Proxy
+     */
+    private Proxy configureProxy() {
+        //TODO : new Proxy(Proxy.Type.HTTP, new InetSocketAddress("ip", port));
+        final Proxy proxy = Proxy.NO_PROXY;
+
+        return proxy;
     }
 }
