@@ -7,18 +7,19 @@ import com.thibaultmeyer.bingwallpaper.wallpaperchanger.MacOsWallpaperChanger;
 import com.thibaultmeyer.bingwallpaper.wallpaperchanger.WallpaperChanger;
 import com.thibaultmeyer.bingwallpaper.wallpaperchanger.WindowsWallpaperChanger;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * This service takes care of getting the wallpaper of the day and using it.
@@ -34,18 +35,18 @@ public final class BingWallpaperService implements Runnable {
         new MacOsWallpaperChanger(),
         new WindowsWallpaperChanger());
 
-    private final Dimension wallpaperDimension;
-    private final String tmpFileName;
+    private final Settings settings;
+
+    private URL latestWallpaperUrl;
 
     /**
      * Build a new instance.
      *
-     * @param wallpaperDimension The needed wallpaper dimension
-     * @param tmpFileName        Temporary file for downloaded Wallpaper
+     * @param settings Current settings
      */
-    public BingWallpaperService(final Dimension wallpaperDimension, final String tmpFileName) {
-        this.wallpaperDimension = wallpaperDimension;
-        this.tmpFileName = tmpFileName;
+    public BingWallpaperService(final Settings settings) {
+        this.settings = settings;
+        this.latestWallpaperUrl = null;
     }
 
     /**
@@ -63,13 +64,15 @@ public final class BingWallpaperService implements Runnable {
     public void run() {
         try {
             final URL url = retrieveDailyWallpaperUrl();
-            if (url != null) {
+            if (url != null && !Objects.equals(url, latestWallpaperUrl)) {
                 if (saveToLocal(url)) {
+                    latestWallpaperUrl = url;
+
                     final boolean result = WALLPAPER_CHANGER_LIST
                         .stream()
                         .filter(WallpaperChanger::canRunOnThisSystem)
                         .findFirst()
-                        .map(wp -> wp.changeWallpaper(tmpFileName))
+                        .map(wp -> wp.changeWallpaper(settings.targetFileName))
                         .orElse(false);
                     if (result) {
                         System.out.println("New wallpaper applied with success");
@@ -95,10 +98,10 @@ public final class BingWallpaperService implements Runnable {
         final URL bingApiUrl = new URL(String.format(
             BING_API_URL,
             System.currentTimeMillis() / 1000,
-            wallpaperDimension.width,
-            wallpaperDimension.height));
+            settings.dimensionWidth,
+            settings.dimensionHeight));
 
-        final HttpURLConnection httpConnection = createHttpConnection(bingApiUrl);
+        final HttpURLConnection httpConnection = openHttpConnection(bingApiUrl);
 
         if (httpConnection.getResponseCode() == 200) {
             final InputStreamReader inputStreamReader = new InputStreamReader(httpConnection.getInputStream());
@@ -127,14 +130,14 @@ public final class BingWallpaperService implements Runnable {
      * @throws IOException If something goes wrong during the process
      */
     private boolean saveToLocal(final URL urlToSave) throws IOException {
-        final HttpURLConnection httpConnection = createHttpConnection(urlToSave);
+        final HttpURLConnection httpConnection = openHttpConnection(urlToSave);
 
         if (httpConnection.getResponseCode() == 200) {
             final InputStream inputStream = httpConnection.getInputStream();
 
             Files.copy(
                 inputStream,
-                new File(tmpFileName).toPath(),
+                new File(settings.targetFileName).toPath(),
                 StandardCopyOption.REPLACE_EXISTING);
 
             inputStream.close();
@@ -148,18 +151,20 @@ public final class BingWallpaperService implements Runnable {
     }
 
     /**
-     * Create an HTTP connection.
+     * Open an HTTP connection.
      *
      * @param url URL to use
-     * @return Created HTTP connection
+     * @return Opened HTTP connection
      * @throws IOException If something goes wrong during the process
      */
-    private HttpURLConnection createHttpConnection(final URL url) throws IOException {
+    private HttpURLConnection openHttpConnection(final URL url) throws IOException {
         final Proxy proxy = configureProxy();
         final HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection(proxy);
+
         httpConnection.setRequestProperty("User-Agent", USER_AGENT_EDGE);
         httpConnection.setConnectTimeout(15000);
         httpConnection.setReadTimeout(15000);
+        httpConnection.connect();
 
         return httpConnection;
     }
@@ -170,9 +175,10 @@ public final class BingWallpaperService implements Runnable {
      * @return Configured Proxy
      */
     private Proxy configureProxy() {
-        //TODO : new Proxy(Proxy.Type.HTTP, new InetSocketAddress("ip", port));
-        final Proxy proxy = Proxy.NO_PROXY;
+        if (settings.proxyType == null) {
+            return Proxy.NO_PROXY;
+        }
 
-        return proxy;
+        return new Proxy(settings.proxyType, new InetSocketAddress(settings.proxyHost, settings.proxyPort));
     }
 }

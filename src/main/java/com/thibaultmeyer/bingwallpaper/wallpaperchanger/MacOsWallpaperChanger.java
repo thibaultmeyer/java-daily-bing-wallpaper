@@ -7,7 +7,7 @@ import java.io.IOException;
 /**
  * MacOS (Apple) implementation of {@code WallpaperChanger}.
  */
-public class MacOsWallpaperChanger implements WallpaperChanger {
+public final class MacOsWallpaperChanger implements WallpaperChanger {
 
     @Override
     public boolean canRunOnThisSystem() {

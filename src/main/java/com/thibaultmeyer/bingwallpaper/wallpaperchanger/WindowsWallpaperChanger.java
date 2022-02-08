@@ -12,7 +12,7 @@ import java.util.HashMap;
 /**
  * Windows implementation of {@code WallpaperChanger}.
  */
-public class WindowsWallpaperChanger implements WallpaperChanger {
+public final class WindowsWallpaperChanger implements WallpaperChanger {
 
     @Override
     public boolean canRunOnThisSystem() {

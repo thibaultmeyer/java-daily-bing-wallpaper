@@ -8,7 +8,7 @@ import java.util.Locale;
 /**
  * Linux (GNOME) implementation of {@code WallpaperChanger}.
  */
-public class LinuxGnomeWallpaperChanger implements WallpaperChanger {
+public final class LinuxGnomeWallpaperChanger implements WallpaperChanger {
 
     @Override
     public boolean canRunOnThisSystem() {
