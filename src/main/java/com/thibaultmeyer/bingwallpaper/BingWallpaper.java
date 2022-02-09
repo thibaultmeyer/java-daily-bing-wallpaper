@@ -28,10 +28,10 @@ public final class BingWallpaper {
     /**
      * Main entry.
      *
-     * @param args Entry arguments
+     * @param argList Program arguments
      * @throws IOException If something goes wrong during the process
      */
-    public static void main(final String[] args) throws IOException {
+    public static void main(final String[] argList) throws IOException {
         System.out.println("Booting...");
 
         // Check if operating system is handled
@@ -52,13 +52,34 @@ public final class BingWallpaper {
             System.out.printf("  > Proxy          : %s %s:%d%n", settings.proxyType, settings.proxyHost, settings.proxyPort);
         }
 
-        // Run service (looking for new wallpaper each hour)
+        // Run service
+        final BingWallpaperService service = new BingWallpaperService(settings);
+
         System.out.println("Ready!");
-        scheduledExecutorService.scheduleWithFixedDelay(
-            new BingWallpaperService(settings),
-            0,
-            1,
-            TimeUnit.HOURS);
+        if (isSingleRun(argList)) {
+            service.run();
+        } else {
+            scheduledExecutorService.scheduleWithFixedDelay(
+                service,
+                0,
+                1,
+                TimeUnit.HOURS);
+        }
+    }
+
+    /**
+     * Detect if program is run on "single run" mode.
+     *
+     * @param argList Program arguments
+     * @return {@code true} if "single run" mode is enabled, otherwise, {@code false}
+     */
+    private static boolean isSingleRun(final String[] argList) {
+        for (final String arg : argList) {
+            if (arg.trim().equalsIgnoreCase("--single") || arg.trim().equalsIgnoreCase("-s")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
