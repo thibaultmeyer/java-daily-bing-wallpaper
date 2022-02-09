@@ -79,6 +79,7 @@ public final class BingWallpaper {
                 return true;
             }
         }
+
         return false;
     }
 
