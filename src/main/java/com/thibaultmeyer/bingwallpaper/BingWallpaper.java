@@ -1,6 +1,7 @@
 package com.thibaultmeyer.bingwallpaper;
 
 import com.thibaultmeyer.bingwallpaper.utils.OperatingSystemUtils;
+import com.thibaultmeyer.bingwallpaper.utils.SingleInstanceUtils;
 
 import java.awt.*;
 import java.io.BufferedReader;
@@ -33,6 +34,12 @@ public final class BingWallpaper {
      */
     public static void main(final String[] argList) throws IOException {
         System.out.println("Booting...");
+
+        // Check if another instance already running
+        if (SingleInstanceUtils.hasExistingInstance()) {
+            System.err.println("Another instance already running");
+            System.exit(1);
+        }
 
         // Check if operating system is handled
         if (!BingWallpaperService.canRunOnThisSystem()) {
