@@ -160,7 +160,8 @@ public final class BingWallpaper {
                 : temporaryFolder + File.separatorChar + "file.jpg";
         } else {
             // Use value from Properties
-            targetFileName = properties.getProperty("targetFileName");
+            targetFileName = properties.getProperty("targetFileName")
+                .replace("~", System.getProperty("user.home"));
         }
 
         if (properties.getProperty("proxyType", "none").toUpperCase(Locale.ENGLISH).equals("NONE")) {
