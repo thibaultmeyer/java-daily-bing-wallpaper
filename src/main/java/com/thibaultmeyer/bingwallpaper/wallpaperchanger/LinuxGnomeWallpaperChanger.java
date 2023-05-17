@@ -12,6 +12,7 @@ public final class LinuxGnomeWallpaperChanger implements WallpaperChanger {
 
     @Override
     public boolean canRunOnThisSystem() {
+
         if (OperatingSystemUtils.IS_UNIX || OperatingSystemUtils.IS_SOLARIS) {
             String desktop = System.getenv("XDG_CURRENT_DESKTOP");
             if (desktop == null || desktop.isEmpty()) {
@@ -29,6 +30,7 @@ public final class LinuxGnomeWallpaperChanger implements WallpaperChanger {
 
     @Override
     public boolean changeWallpaper(final String fileName) {
+
         if (fileName != null && !fileName.isEmpty()) {
             try {
                 final String[] args = {

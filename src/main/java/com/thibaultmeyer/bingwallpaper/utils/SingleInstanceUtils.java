@@ -22,6 +22,7 @@ public final class SingleInstanceUtils {
      * @return {@code true} if other instance exists, otherwise, {@code false}
      */
     public static boolean hasExistingInstance() {
+
         if (OperatingSystemUtils.IS_WINDOWS) {
             final HANDLE hNamedPipe = Kernel32.INSTANCE.CreateNamedPipe(
                 LOCK_FILE_WINDOWS,

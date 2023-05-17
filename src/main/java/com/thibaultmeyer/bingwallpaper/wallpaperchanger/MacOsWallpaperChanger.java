@@ -11,11 +11,13 @@ public final class MacOsWallpaperChanger implements WallpaperChanger {
 
     @Override
     public boolean canRunOnThisSystem() {
+
         return OperatingSystemUtils.IS_MAC;
     }
 
     @Override
     public boolean changeWallpaper(final String fileName) {
+
         if (fileName != null && !fileName.isEmpty()) {
             try {
                 final String[] args = {

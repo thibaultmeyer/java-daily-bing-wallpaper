@@ -16,11 +16,13 @@ public final class WindowsWallpaperChanger implements WallpaperChanger {
 
     @Override
     public boolean canRunOnThisSystem() {
+
         return OperatingSystemUtils.IS_WINDOWS;
     }
 
     @Override
     public boolean changeWallpaper(final String fileName) {
+
         if (fileName != null && !fileName.isEmpty()) {
             return User32.INSTANCE.SystemParametersInfo(
                 new WinDef.UINT(User32.SPI_SETDESKWALLPAPER),

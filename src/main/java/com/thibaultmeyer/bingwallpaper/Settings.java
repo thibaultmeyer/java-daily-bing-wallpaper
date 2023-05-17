@@ -53,6 +53,7 @@ public final class Settings {
                     final Proxy.Type proxyType,
                     final String proxyHost,
                     final int proxyPort) {
+
         this.dimensionWidth = dimensionWidth;
         this.dimensionHeight = dimensionHeight;
         this.targetFileName = targetFileName;

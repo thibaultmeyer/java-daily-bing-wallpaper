@@ -3,7 +3,8 @@ package com.thibaultmeyer.bingwallpaper;
 import com.thibaultmeyer.bingwallpaper.utils.OperatingSystemUtils;
 import com.thibaultmeyer.bingwallpaper.utils.SingleInstanceUtils;
 
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -33,6 +34,7 @@ public final class BingWallpaper {
      * @throws IOException If something goes wrong during the process
      */
     public static void main(final String[] argList) throws IOException {
+
         System.out.println("Booting...");
 
         // Check if another instance already running
@@ -81,6 +83,7 @@ public final class BingWallpaper {
      * @return {@code true} if "single run" mode is enabled, otherwise, {@code false}
      */
     private static boolean isSingleRun(final String[] argList) {
+
         for (final String arg : argList) {
             if (arg.trim().equalsIgnoreCase("--single") || arg.trim().equalsIgnoreCase("-s")) {
                 return true;
@@ -97,6 +100,7 @@ public final class BingWallpaper {
      * @throws IOException If something goes wrong during the process
      */
     private static Properties loadOrCreateProperties() throws IOException {
+
         final Path path = Paths.get(System.getProperty("user.home"), ".bingwallpaper", "settings.properties");
         final Properties properties = new Properties();
 
