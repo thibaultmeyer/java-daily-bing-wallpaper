@@ -1,7 +1,8 @@
 package com.thibaultmeyer.bingwallpaper;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.thibaultmeyer.bingwallpaper.wallpaperchanger.LinuxGnomeWallpaperChanger;
 import com.thibaultmeyer.bingwallpaper.wallpaperchanger.MacOsWallpaperChanger;
 import com.thibaultmeyer.bingwallpaper.wallpaperchanger.WallpaperChanger;
@@ -45,6 +46,7 @@ public final class BingWallpaperService implements Runnable {
      * @param settings Current settings
      */
     public BingWallpaperService(final Settings settings) {
+
         this.settings = settings;
         this.latestWallpaperUrl = null;
     }
@@ -55,6 +57,7 @@ public final class BingWallpaperService implements Runnable {
      * @return {@code true} if it can work, otherwise, {@code false}
      */
     public static boolean canRunOnThisSystem() {
+
         return WALLPAPER_CHANGER_LIST
             .stream()
             .anyMatch(WallpaperChanger::canRunOnThisSystem);
@@ -62,6 +65,7 @@ public final class BingWallpaperService implements Runnable {
 
     @Override
     public void run() {
+
         try {
             final URL url = retrieveDailyWallpaperUrl();
             if (url != null && !Objects.equals(url, latestWallpaperUrl)) {
@@ -95,6 +99,7 @@ public final class BingWallpaperService implements Runnable {
      * @throws IOException If something goes wrong during the process
      */
     private URL retrieveDailyWallpaperUrl() throws IOException {
+
         final URL bingApiUrl = new URL(String.format(
             BING_API_URL,
             System.currentTimeMillis() / 1000,
@@ -106,14 +111,13 @@ public final class BingWallpaperService implements Runnable {
         if (httpConnection.getResponseCode() == 200) {
             final InputStreamReader inputStreamReader = new InputStreamReader(httpConnection.getInputStream());
 
-            final ObjectMapper objectMapper = new ObjectMapper();
-            final JsonNode jsonNode = objectMapper.readTree(inputStreamReader);
+            final JsonObject jsonObject = JsonParser.parseReader(inputStreamReader).getAsJsonObject();
             inputStreamReader.close();
             httpConnection.disconnect();
 
-            final JsonNode jsonNodeImages = jsonNode.get("images");
-            if (jsonNodeImages.has(0)) {
-                return new URL(BING_URL + jsonNodeImages.get(0).get("url").asText());
+            final JsonArray jsonArrayImages = jsonObject.get("images").getAsJsonArray();
+            if (jsonArrayImages.size() > 0) {
+                return new URL(BING_URL + jsonArrayImages.get(0).getAsJsonObject().get("url").getAsString());
             }
         } else {
             httpConnection.disconnect();
@@ -130,8 +134,8 @@ public final class BingWallpaperService implements Runnable {
      * @throws IOException If something goes wrong during the process
      */
     private boolean saveToLocal(final URL urlToSave) throws IOException {
-        final HttpURLConnection httpConnection = openHttpConnection(urlToSave);
 
+        final HttpURLConnection httpConnection = openHttpConnection(urlToSave);
         if (httpConnection.getResponseCode() == 200) {
             final InputStream inputStream = httpConnection.getInputStream();
 
@@ -158,6 +162,7 @@ public final class BingWallpaperService implements Runnable {
      * @throws IOException If something goes wrong during the process
      */
     private HttpURLConnection openHttpConnection(final URL url) throws IOException {
+
         final Proxy proxy = configureProxy();
         final HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection(proxy);
 
@@ -175,6 +180,7 @@ public final class BingWallpaperService implements Runnable {
      * @return Configured Proxy
      */
     private Proxy configureProxy() {
+
         if (settings.proxyType == null) {
             return Proxy.NO_PROXY;
         }
