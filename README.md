@@ -4,7 +4,7 @@ Get and use the wallpaper of the day from Bing.
 *****
 
 ## Build & install from sources
-To compile and install this project, you must ensure that Java 8 and Maven 3 are being correctly installed.
+To compile and install this project, you must ensure that Java 9 and Maven 3 are being correctly installed.
 
 ```bash
 #> mvn package
@@ -31,7 +31,7 @@ targetFileName=auto
 ## Run
 
 ```bash
-#> java -jar bing-wallpaper-2022-SNAPSHOT-jar-with-dependencies.jar [--single]]
+#> java -jar bing-wallpaper-<version>-jar-with-dependencies.jar [--single]]
 ```
 
 If the flag `--single` is used, application will automatically exit after changing the wallpaper.
