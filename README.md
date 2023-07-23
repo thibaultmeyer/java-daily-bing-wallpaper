@@ -1,5 +1,14 @@
 # Bing Wallpaper
 
+```diff
+! This project is no longer being maintained.
+! A new project developed in Rust has been created to replace Java
+! in order to have a better memory fingerprint and performance.
+
++-> https://github.com/thibaultmeyer/bingwallpaper <-+
+```
+
+
 Get and use the wallpaper of the day from Bing.
 *****
 
